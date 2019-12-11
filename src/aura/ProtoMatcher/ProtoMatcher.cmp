@@ -1,0 +1,89 @@
+<!--
+ - Created by ronanwilliams on 2019-12-11.
+ -->
+
+<aura:component description="ProtoMatcher" controller="TransactionMatcher" implements="flexipage:availableForAllPageTypes">
+
+    <aura:attribute name="serverMatch" type="boolean" default="true"/>
+    <aura:attribute name="transactions" type="boolean" default="true"/>
+    <aura:attribute name="trials" type="Object[]" default="[]"/>
+    <aura:attribute name="pending" type="Boolean" default="false"/>
+
+    <div class="slds-grid slds-gutters">
+
+
+        <div class="slds-col slds-size_2-of-3 slds-is-relative">
+            <aura:if isTrue="{!v.pending}">
+                <lightning:spinner/>
+            </aura:if>
+            <div class="slds-card slds-p-around--medium">
+                content
+                {!v.transactions.length} {!v.serverMatch}
+
+                <div class="slds-grid">
+                    <div class="slds-col">VENDOR</div>
+                    <div class="slds-col">DESCRIPTION</div>
+                    <div class="slds-col">TRANS. DATE</div>
+                    <div class="slds-col">POSTING DATE</div>
+                    <div class="slds-col">AMOUNT</div>
+                    <div class="slds-col">MACTHES</div>
+                </div>
+
+                <aura:iteration items="{!v.transactions}" var="transaction">
+                    <div class="slds-grid">
+                        <div class="slds-col">{!transaction.Vendor__c}</div>
+                        <div class="slds-col">{!transaction.Description__c}</div>
+                        <div class="slds-col">TRANS. DATE</div>
+                        <div class="slds-col">POSTING DATE</div>
+                        <div class="slds-col">AMOUNT</div>
+                        <div class="slds-col">MACTHES</div>
+                    </div>
+                </aura:iteration>
+
+
+            </div>
+
+
+        </div>
+
+        <div class="slds-col slds-size--1-of-3">
+
+
+            <div class="slds-card slds-p-around--medium">
+
+
+
+
+                <div class="slds-grid slds-gutters slds-m-bottom--medium slds-border--bottom">
+                    <div class="slds-col">
+                        <lightning:button label="RETRIEVE AND MATCH" onclick="{!c.getTransactions}" />
+                    </div>
+                    <div class="slds-col">
+                        <lightning:input label="Match in apex" type="toggle"  checked="{!v.serverMatch}"/>
+                    </div>
+                </div>
+
+
+                <div class="slds-grid">
+
+                    <div class="slds-col">SOURCE</div>
+                    <div class="slds-col">TRANS</div>
+                    <div class="slds-col">EXPENSES</div>
+                    <div class="slds-col">MATCHES</div>
+                    <div class="slds-col">DURATION</div>
+
+                </div>
+
+
+                <aura:iteration items="{!v.trials}" var="trial">
+                    <div class="slds-m-bottom--medium slds-border--bottom">{!trial}</div>
+                </aura:iteration>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+</aura:component>
