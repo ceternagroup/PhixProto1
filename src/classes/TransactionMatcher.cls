@@ -29,7 +29,8 @@ public with sharing class TransactionMatcher {
         // otherwise return the Expense records to the client for javascript processing
         } else {
             responseMap.put('expenses',[SELECT Id, Name, salestrip__Description__c, salestrip__Vendor__c,
-                                                salestrip__Amount__c, salestrip__Date__c, salestrip__TransactionCurrency__c
+                                                salestrip__TransactionAmount__c, salestrip__Amount__c,
+                                                salestrip__Date__c, salestrip__TransactionCurrency__c
                                         FROM salestrip__Expense__c
                                         WHERE OwnerId = :UserInfo.getUserId()]);
         }
@@ -65,7 +66,8 @@ public with sharing class TransactionMatcher {
         }
 
         for (salestrip__Expense__c expense : [SELECT Id, Name, salestrip__Description__c, salestrip__Vendor__c,
-                                                    salestrip__Amount__c, salestrip__Date__c, salestrip__TransactionCurrency__c
+                                                    salestrip__TransactionAmount__c, salestrip__Amount__c,
+                                                    salestrip__Date__c, salestrip__TransactionCurrency__c
                                                 FROM salestrip__Expense__c
 //                                                WHERE OwnerId = :UserInfo.getUserId()
                                                 ]){
@@ -78,7 +80,7 @@ public with sharing class TransactionMatcher {
                         transactionMap.get(transKey).RejectedMatches__c.indexOf(expense.Id) == -1){
 
                     // align match attributes by checking if the Expense properties occur in the transaction identifier key string
-                    Boolean amountMatch      = transKey.indexOf('::' + String.valueOf(expense.salestrip__Amount__c) + '::') != -1;
+                    Boolean amountMatch      = transKey.indexOf('::' + String.valueOf(expense.salestrip__TransactionAmount__c) + '::') != -1;
                     Boolean currencyMatch    = transKey.indexOf('::' + expense.salestrip__TransactionCurrency__c + '::') != -1;
                     Boolean dateMatch        = transKey.indexOf('::' + expense.salestrip__Date__c + '::') != -1;
                     Boolean vendorMatch      = ignoreVendor ? true : transKey.indexOf(expense.salestrip__Vendor__c.toLowerCase().replace(' ','')) != -1;

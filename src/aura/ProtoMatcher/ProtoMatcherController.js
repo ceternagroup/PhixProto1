@@ -36,11 +36,13 @@
 
                         var transDate = new Date(transaction.TransactionDate__c);
 
+                        console.log('trans iso',transaction.ISOCode__c);
+
                         transaction.Identifier =
                             // add the transaction date to the identifier string
-                            '::' + new Date(transDate).setDate(transDate.getDate() - 1) +
+                            '::' + new Date(transDate.setDate(transDate.getDate() - 1)) +
                             '::' + transDate +
-                            '::' + new Date(transDate).setDate(transDate.getDate() + 1) +
+                            '::' + new Date(transDate.setDate(transDate.getDate() + 1)) +
 
                             // add the vendor name and transaction description to the identifier string
                             '::' + transaction.Vendor__c.toLowerCase().replace(' ','') + '::' + transaction.Description__c + '::' +
@@ -53,16 +55,19 @@
                     if (expenses){
                         expenses.forEach(function(expense){
 
-                            transactions.forEach(function(transaction){
+                            console.log('when expense iso is ',expense.salestrip__TransactionCurrency__c, ' amt is ', expense.salestrip__Amount__c);
 
-                                console.log('currency',expense.salestrip__TransactionCurrency__c );
+
+                            console.log('date',new Date(expense.salestrip__Date__c));
+
+                            transactions.forEach(function(transaction){
 
                                 // do not attempt to match the Expense with the Bank Transaction if the Expense
                                 // has already been rejected as a match
-                                if (!transaction.RejectedMatches__c || transaction.RejectedMatches__c.indexOf(expense.Id) === -1){
+                                if (!transaction.RejectedMatches__c || transaction.RejectedMatches__c.includes(expense.Id)){
 
                                     // align match attributes by checking if the Expense properties occur in the transaction identifier key string
-                                    var amountMatch      = transaction.Identifier.includes('::' + expense.salestrip__Amount__c + '::');
+                                    var amountMatch      = transaction.Identifier.includes('::' + expense.salestrip__TransactionAmount__c + '::');
                                     var currencyMatch    = transaction.Identifier.includes('::' + expense.salestrip__TransactionCurrency__c + '::');
                                     var dateMatch        = transaction.Identifier.includes('::' + new Date(expense.salestrip__Date__c) + '::');
                                     var vendorMatch      = $C.get('v.ignoreVendor') ? true : transaction.Identifier.includes(expense.salestrip__Vendor__c.toLowerCase().replace(' ',''));

@@ -90,8 +90,8 @@
                                                             </div>
 
                                                             <div class="slds-col slds-size--2-of-12">
-                                                                <lightning:formattedNumber value="{!match.salestrip__Amount__c}"
-                                                                                           style="currency" currencyCode="GBP"/>
+                                                                <lightning:formattedNumber value="{!match.salestrip__TransactionAmount__c}"
+                                                                                           style="currency" currencyCode="{!match.salestrip__TransactionCurrency__c}"/>
                                                             </div>
                                                             <div class="slds-col slds-size--1-of-12 slds-grid">
                                                                 <button class="slds-button slds-button_neutral" data-trans="{!transaction.Id}" data-exp="{!match.Id}"
