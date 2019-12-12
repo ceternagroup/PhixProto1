@@ -19,7 +19,8 @@ public with sharing class TransactionMatcher {
                                                 SystemModstamp, TransactionDate__c, Vendor__c, SuggestedMatches__c, Description__c,
                                                 Expense__c
                                         FROM BankTransaction__c
-                                        WHERE OwnerId = :UserInfo.getUserId()];
+//                                        WHERE OwnerId = :UserInfo.getUserId()
+                                        ];
 
         // if we want to find potential Expenses to match with our Bank Transactions run the match in Apex
         if (serverMatch){
@@ -28,7 +29,7 @@ public with sharing class TransactionMatcher {
         // otherwise return the Expense records to the client for javascript processing
         } else {
             responseMap.put('expenses',[SELECT Id, Name, salestrip__Description__c, salestrip__Vendor__c,
-                                                salestrip__Amount__c, salestrip__Date__c
+                                                salestrip__Amount__c, salestrip__Date__c, salestrip__TransactionCurrency__c
                                         FROM salestrip__Expense__c
                                         WHERE OwnerId = :UserInfo.getUserId()]);
         }
@@ -64,9 +65,10 @@ public with sharing class TransactionMatcher {
         }
 
         for (salestrip__Expense__c expense : [SELECT Id, Name, salestrip__Description__c, salestrip__Vendor__c,
-                                                    salestrip__Amount__c, salestrip__Date__c
+                                                    salestrip__Amount__c, salestrip__Date__c, salestrip__TransactionCurrency__c
                                                 FROM salestrip__Expense__c
-                                                WHERE OwnerId = :UserInfo.getUserId()]){
+//                                                WHERE OwnerId = :UserInfo.getUserId()
+                                                ]){
 
             for (String transKey : transactionMap.keySet()){
 
@@ -77,14 +79,16 @@ public with sharing class TransactionMatcher {
 
                     // align match attributes by checking if the Expense properties occur in the transaction identifier key string
                     Boolean amountMatch      = transKey.indexOf('::' + String.valueOf(expense.salestrip__Amount__c) + '::') != -1;
+                    Boolean currencyMatch    = transKey.indexOf('::' + expense.salestrip__TransactionCurrency__c + '::') != -1;
                     Boolean dateMatch        = transKey.indexOf('::' + expense.salestrip__Date__c + '::') != -1;
                     Boolean vendorMatch      = ignoreVendor ? true : transKey.indexOf(expense.salestrip__Vendor__c.toLowerCase().replace(' ','')) != -1;
                     Boolean descriptionMatch = !ignoreVendor && !vendorMatch && includeDescription && expense.salestrip__Description__c != null ?
                             transKey.indexOf(expense.salestrip__Description__c.toLowerCase().replace(' ','')) != -1 : true;
 
                     // if all relevant attributes match the Bank Transaction, add the record as a suggested match
-                    if (amountMatch && dateMatch && vendorMatch && descriptionMatch){
-                        transactionMap.get(transKey).SuggestedMatches__c = JSON.serialize(expense);
+                    if (amountMatch && currencyMatch && dateMatch && vendorMatch && descriptionMatch){
+                        String delimiter = transactionMap.get(transKey).SuggestedMatches__c.length() > 0 ? ',' : '';
+                        transactionMap.get(transKey).SuggestedMatches__c += delimiter + JSON.serialize(expense);
                     }
                 }
             }
